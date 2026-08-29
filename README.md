@@ -2,7 +2,7 @@
 
 Lenovo 拯救者 R7000 2020（AMD Ryzen 7 4800H）专用 OpenCore EFI（OpenCore 1.0.7），基于 SimpleKaruzi 的 EFI 深度调校，力求开箱即用。
 
-- **理论支持范围**：macOS Mojave (10.14) ～ Tahoe (26)，低于 Mojave 的版本未做测试。
+- **支持范围**：实测 Catalina (10.15) ～ Tahoe (26)；Mojave (10.14) 为理论支持，未实测。
 - 各版本安装成果截图见 [Screenshots](./Screenshots)。
 - 本 EFI 引用的全部外部链接汇总于 [Links.txt](./Links.txt)。
 
@@ -38,7 +38,7 @@ Lenovo 拯救者 R7000 2020（AMD Ryzen 7 4800H）专用 OpenCore EFI（OpenCore
 
 - **启用** Switchable Graphics（双显卡切换）
 - UMA Frame Buffer Size ≥ **1G**
-- **关闭** Secure Boot；建议同时关闭 AMD SVM 与 TPM
+- **关闭** Secure Boot；AMD SVM 与 TPM 可选关闭（不影响使用）
 
 ## 配置文件选择
 
@@ -51,6 +51,12 @@ Lenovo 拯救者 R7000 2020（AMD Ryzen 7 4800H）专用 OpenCore EFI（OpenCore
 | `config.plist`（默认） | Monterey (12.x) ～ Tahoe (26.x) | Monterey 使用 `UTBDefault.kext`；Ventura ～ Sequoia 使用 `UTBMap.kext`；Tahoe 使用 `UTBMapTahoe.kext`（经 MinKernel/MaxKernel 自动切换） |
 
 > 出厂海力士硬盘的屏蔽 SSDT（`SSDT-Disable_NVMe_GPP1.aml`）**仅在默认配置中启用**；Mojave2Catalina 与 BigSur 配置中该条目默认关闭，如有需要请手动开启。
+
+### 安装阶段：临时禁用 NootedRed
+
+**全新安装系统时，需先将 `NootedRed.kext` 临时禁用**：在 config 的 `Kernel → Add` 中把 `NootedRed.kext` 的 `Enabled` 设为 `false`，完成安装、进入桌面后再改回 `true` 并重启。
+
+日常使用必须保持启用——核显驱动依赖它。
 
 ### boot-args
 
@@ -72,11 +78,12 @@ Lenovo 拯救者 R7000 2020（AMD Ryzen 7 4800H）专用 OpenCore EFI（OpenCore
 
 ## NVMe 屏蔽说明
 
-本机出厂硬盘为海力士 PC611（macOS 不兼容），EFI 通过 `SSDT-Disable_NVMe_GPP1.aml` 屏蔽，另加装 WD Blue SN570 作为系统盘。
+`SSDT-Disable_NVMe_GPP1.aml` 的作用是**屏蔽出厂硬盘位**（GPP1）。本机出厂海力士 PC611 正插在该硬盘位且不兼容 macOS，故默认配置已启用该 SSDT（Mojave2Catalina / BigSur 配置中默认关闭）。
 
-- 出厂盘同为海力士（或同系列不兼容型号）：无需改动。
-- 出厂盘为 macOS 兼容型号（WD、Samsung 等）：禁用或删除 `EFI/OC/ACPI/SSDT-Disable_NVMe_GPP1.aml`，否则该硬盘位无法识别。
-- **替代方案**：出厂盘为 SK hynix PC711 / BC711 / BC511 或三星 PM991 时，可启用已内置的 `PC711Probe.kext` 免除屏蔽，详见 [Kexts.md](./docs/Kexts.md#pc711probe备用默认禁用)。
+- 海力士原装盘（或同系列不兼容型号）仍插在该硬盘位：保持 SSDT 启用即可。
+- 该硬盘位更换为 macOS 兼容硬盘（WD、Samsung 等）：禁用或删除该 SSDT，否则此硬盘位无法识别。
+- 不兼容的海力士盘若位于**另一硬盘位**：自带的 SSDT 屏蔽不到该位置，需自行制作屏蔽对应硬盘位的 SSDT，或将硬盘换至出厂硬盘位（GPP1）以使用本 EFI 自带的屏蔽 SSDT。
+- **替代方案**：也可尝试启用内置的 `PC711Probe.kext` / `PC711ProbeForce.kext` 免除屏蔽，详见 [Kexts.md](./docs/Kexts.md#pc711probe--pc711probeforce备用默认禁用)。
 
 ## 后记
 
