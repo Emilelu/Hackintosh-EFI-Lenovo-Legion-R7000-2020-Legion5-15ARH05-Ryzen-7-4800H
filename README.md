@@ -1,19 +1,20 @@
 # Hackintosh-EFI-Lenovo-Legion-R7000-2020-Ryzen-7-4800H
 
-Lenovo 拯救者 R7000 2020（AMD Ryzen 7 4800H）专用 OpenCore EFI（OpenCore 1.0.7），基于 SimpleKaruzi 的 EFI 深度调校，力求开箱即用。
+Lenovo 拯救者 R7000 2020（AMD Ryzen 7 4800H）专用 OpenCore EFI（OpenCore 1.0.9 dev），基于 SimpleKaruzi 的 EFI 深度调校，力求开箱即用。
 
 - **支持范围**：实测 Catalina (10.15) ～ Tahoe (26)；Mojave (10.14) 为理论支持，未实测。
 - 各版本安装成果截图见 [Screenshots](./Screenshots)。
-- 本 EFI 引用的全部外部链接汇总于 [Links.txt](./Links.txt)。
+- 本 EFI 引用的全部外部链接汇总于 [docs/Links.md](./docs/Links.md)。
 
 ## 文档导航
 
 | 文档 | 内容 |
 |:---|:---|
 | [docs/Compatibility.md](./docs/Compatibility.md) | 各 macOS 版本差异速查、Wi-Fi 驱动矩阵、Tahoe 音频 |
-| [docs/KnownIssues.md](./docs/KnownIssues.md) | 已知问题与修复（Kernel Panic、AirPods、卡顿等） |
+| [docs/KnownIssues.md](./docs/KnownIssues.md) | 已知问题与修复（Kernel Panic、蓝牙、卡顿等） |
 | [docs/Kexts.md](./docs/Kexts.md) | Kext 一览、维护须知（⚠️ 含不可更新清单）、NVMeFix 说明 |
 | [docs/Optional.md](./docs/Optional.md) | 可选优化（HiDPI、内建麦克风等） |
+| [docs/Links.md](./docs/Links.md) | 全部参考链接（修复出处、新方案出处、实验分支） |
 
 ## 硬件配置
 
@@ -22,14 +23,14 @@ Lenovo 拯救者 R7000 2020（AMD Ryzen 7 4800H）专用 OpenCore EFI（OpenCore
 | 主板 | LENOVO LNVNB161216 | AMD 平台笔记本 |
 | BIOS | EUCN41WW (2023-09-20) | UEFI，Secure Boot 已在 BIOS 内禁用 |
 | CPU | AMD Ryzen 7 4800H (Renoir) | 8 核心 16 线程 |
-| 独立显卡 | NVIDIA GeForce GTX 1650 | macOS 无驱动，已通过 `SSDT-Disable_GPU_GPP0.aml` 屏蔽 |
+| 独立显卡 | NVIDIA GeForce GTX 1650 | macOS 无官方驱动，日常使用已通过 `SSDT-Disable_GPU_GPP0.aml` 屏蔽；社区驱动实验（[nullmoth/nvidia-macos-driver](https://github.com/nullmoth/nvidia-macos-driver)，进行中）见 [experimental 分支](https://github.com/Emilelu/Hackintosh-EFI-Lenovo-Legion-R7000-2020-Ryzen-7-4800H/tree/experimental-nvidia-gtx1650) |
 | 核显 | AMD Radeon(TM) Graphics (Renoir) | 已通过 UMAF 解锁并将显存设为 4G（NootedRed 最低 512M，建议 ≥1G） |
 | 内建显示器 | LQ156T1JW05 | 2560x1440 @ 165Hz，连接核显（自行更换），EDID 已注入 config |
 | 有线网卡 | Realtek RTL8168/8111 | 设备 ID `10EC-8168` |
 | 无线网卡 | Intel Wi-Fi 6 AX200 | 设备 ID `8086-2723` |
-| 蓝牙 | Intel Wireless Bluetooth | 设备 ID `8087-0029`，AirPods 无声问题已修复（见 [KnownIssues.md](./docs/KnownIssues.md#2-intel-蓝牙连接-airpods-无声已修复)） |
+| 蓝牙 | Intel Wireless Bluetooth | 设备 ID `8087-0029`；AirPods 无声与 HID 设备连接问题均已修复（见 [KnownIssues.md](./docs/KnownIssues.md#2-intel-蓝牙连接-airpods-无声已修复)） |
 | 声卡 | Realtek ALC257 | 设备 ID `10EC-0257`，layout-id = 101 |
-| NVMe SSD（出厂） | SK hynix HFS512GD9TNI-L2A0B (PC611) | macOS 不兼容，已通过 SSDT 屏蔽（见下文） |
+| NVMe SSD（出厂） | SK hynix HFS512GD9TNI-L2A0B (PC611) | macOS 原生不支持，默认由 `PC711ProbeForce.kext` 强制驱动（见下文） |
 | NVMe SSD（加装） | WD Blue SN570 500GB | 系统盘 |
 | 触摸板 | SYNA2BA6 | I2C HID，VoodooI2C 轮询模式驱动 |
 | 键盘 | PS/2 (FUJ7401) | VoodooPS2Controller 驱动 |
@@ -42,15 +43,14 @@ Lenovo 拯救者 R7000 2020（AMD Ryzen 7 4800H）专用 OpenCore EFI（OpenCore
 
 ## 配置文件选择
 
-不同 macOS 版本对 USB 控制器、显卡补丁及驱动要求差异较大，故拆分为三份配置。**使用前将所选文件重命名为 `config.plist`**：
+仓库只保留两份 config（Big Sur 已并入默认 config）。**使用前将所选文件重命名为 `config.plist`**：
 
 | 配置文件 | 适用系统 | 关键差异 |
 |:---|:---|:---|
-| `config_Mojave2Catalina.plist` | Mojave (10.14) ～ Catalina (10.15) | 启用 `SSDT-Disable_XHC0.aml` 禁用第二 XHCI 控制器；开启 `XhciPortLimit`；SecureBootModel = `Default` |
-| `config_BigSur.plist` | Big Sur (11.x) | 开启 `XhciPortLimit`；USB 使用 `UTBDefault.kext` |
-| `config.plist`（默认） | Monterey (12.x) ～ Tahoe (26.x) | Monterey 使用 `UTBDefault.kext`；Ventura ～ Sequoia 使用 `UTBMap.kext`；Tahoe 使用 `UTBMapTahoe.kext`（经 MinKernel/MaxKernel 自动切换） |
+| `config_Mojave2Catalina.plist` | Mojave (10.14) ～ Catalina (10.15) | 启用 `SSDT-Disable_XHC0.aml` 禁用第二 XHCI 控制器；开启 `XhciPortLimit`，无 USB 注入 kext；SecureBootModel = `Default`；boot-args 少 `itlwm_he=1` 与 `ipc_control_port_options=0` |
+| `config.plist`（默认） | Big Sur (11.x) ～ Tahoe (26.x) | 预生成 `USBMap.kext` 全版本注入；开启 `XhciPortLimit`；SecureBootModel = `Disabled` |
 
-> 出厂海力士硬盘的屏蔽 SSDT（`SSDT-Disable_NVMe_GPP1.aml`）**仅在默认配置中启用**；Mojave2Catalina 与 BigSur 配置中该条目默认关闭，如有需要请手动开启。
+> 出厂盘位（GPP1）的处理：macOS 11–15 由默认启用的 `PC711ProbeForce.kext` 强制驱动，macOS 26 原生支持，10.14–10.15 该盘不可用（也不会触发 panic）；`SSDT-Disable_NVMe_GPP1.aml` 在两份 config 中均已默认关闭，仅当确需屏蔽盘位时手动开启。
 
 ### 安装阶段：临时禁用 NootedRed
 
@@ -61,7 +61,7 @@ Lenovo 拯救者 R7000 2020（AMD Ryzen 7 4800H）专用 OpenCore EFI（OpenCore
 ### boot-args
 
 ```
--v debug=0x100 keepsyms=1 ipc_control_port_options=0 -lilubetaall -amfipassbeta -vi2c-force-polling alcid=101 -btlfxa2dpcheck
+-v debug=0x100 keepsyms=1 ipc_control_port_options=0 -lilubetaall -amfipassbeta -vi2c-force-polling alcid=101 -btlfxa2dpcheck itlwm_he=1
 ```
 
 | 参数 | 作用 |
@@ -73,17 +73,18 @@ Lenovo 拯救者 R7000 2020（AMD Ryzen 7 4800H）专用 OpenCore EFI（OpenCore
 | `-vi2c-force-polling` | I2C 触摸板强制轮询 |
 | `alcid=101` | 声卡 layout-id 注入 |
 | `-btlfxa2dpcheck` | 修复 Intel 蓝牙 + AirPods 无声（Monterey+ 生效） |
+| `itlwm_he=1` | Intel AX200 启用 Wi-Fi 6（HE）模式 |
 
-三份配置的 boot-args 相同；低版本系统会忽略不适用参数，无需手动删改。
+两份 config 的 boot-args 仅差 `itlwm_he=1` 与 `ipc_control_port_options=0`（低版本用不到，已省略），其余完全相同。
 
-## NVMe 屏蔽说明
+## NVMe 兼容说明
 
-`SSDT-Disable_NVMe_GPP1.aml` 的作用是**屏蔽出厂硬盘位**（GPP1）。本机出厂海力士 PC611 正插在该硬盘位且不兼容 macOS，故默认配置已启用该 SSDT（Mojave2Catalina / BigSur 配置中默认关闭）。
+出厂海力士 PC611 不在 macOS 原生支持列表内（macOS 11–15 触发 Identify 超时 panic）。默认 config 已启用 `PC711ProbeForce.kext`：**强制让 macOS 原生不支持的 NVMe 也能运行**，取代旧的"屏蔽出厂盘位"方案。
 
-- 海力士原装盘（或同系列不兼容型号）仍插在该硬盘位：保持 SSDT 启用即可。
-- 该硬盘位更换为 macOS 兼容硬盘（WD、Samsung 等）：禁用或删除该 SSDT，否则此硬盘位无法识别。
-- 不兼容的海力士盘若位于**另一硬盘位**：自带的 SSDT 屏蔽不到该位置，需自行制作屏蔽对应硬盘位的 SSDT，或将硬盘换至出厂硬盘位（GPP1）以使用本 EFI 自带的屏蔽 SSDT。
-- **替代方案**：也可尝试启用内置的 `PC711Probe.kext` / `PC711ProbeForce.kext` 免除屏蔽，详见 [Kexts.md](./docs/Kexts.md#pc711probe--pc711probeforce备用默认禁用)。
+- 出厂 PC611 无论在哪个硬盘位，macOS 11–15 都由 PC711ProbeForce 强制驱动；macOS 26 原生支持 PC711，无需加载。
+- 10.14–10.15 低于 PC711Probe 的最低内核要求（不加载）：该版本下出厂盘不可用，但不会触发 panic。
+- `SSDT-Disable_NVMe_GPP1.aml`（屏蔽 GPP1 盘位）在两份 config 中均已默认关闭，仅当 Force 不适用于你的型号时再手动开启。
+- 更换为 WD、Samsung 等兼容硬盘时无需任何处理。
 
 ## 后记
 

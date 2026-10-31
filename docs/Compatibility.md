@@ -6,15 +6,10 @@
 
 | macOS | USB 方案 | 蓝牙 | Wi-Fi | 其他 |
 |:---|:---|:---|:---|:---|
-| Mojave (10.14) ～ Catalina (10.15) | 禁用 XHC0 + `XhciPortLimit` | IntelBluetoothInjector | AirportItlwmMojave / Catalina | SecureBootModel = `Default` |
-| Big Sur (11.x) | UTBDefault + `XhciPortLimit` | IntelBluetoothInjector | AirportItlwmBigSur | — |
-| Monterey (12.x) | UTBDefault | BlueToolFixup | AirportItlwmMonterey | — |
-| Ventura (13.x) ～ Sequoia (15.x) | UTBMap | BlueToolFixup | AirportItlwmVentura / Sonoma 分版 / AboveSequoia | Sequoia+ 需 OCLP-MOD 补丁 |
-| Tahoe (26.x) | UTBMapTahoe | BlueToolFixup | AirportItlwmAboveSequoia | 需 OCLP-MOD 补丁 |
+| Mojave (10.14) ～ Catalina (10.15) | 禁用 XHC0 + `XhciPortLimit`（无注入 kext） | IntelBluetoothInjector | AirportItlwmMojave / Catalina | SecureBootModel = `Default` |
+| Big Sur (11.x) ～ Tahoe (26.x) | 预生成 `USBMap.kext` + `XhciPortLimit` | ≤ Big Sur：IntelBluetoothInjector；Monterey+：BlueToolFixup | AirportItlwm 按版本自动匹配（见下表） | SecureBootModel = `Disabled` |
 
 > **Catalina 及以下的代价**：无法使用为 Big Sur+ 修改的 `GenericUSBXHCI.kext`，双 XHCI 控制器互相冲突，必须通过 `SSDT-Disable_XHC0.aml` 禁用其中一个。左侧 USB-A、后侧 Type-C 及内置摄像头将不可用，此为获得稳定蓝牙与正常启动的必要代价。
-
-> **Tahoe (26) 的 USB 映射**：Tahoe 内核（Darwin 25）的 USB 结构有变化，故使用单独定制的 `UTBMapTahoe.kext`（MinKernel 25.0.0）。
 
 ## Wi-Fi 驱动矩阵
 
@@ -29,12 +24,11 @@ AirportItlwm 通过 MinKernel / MaxKernel 自动匹配版本，**Sonoma 14.0–1
 | Ventura (13.x) | AirportItlwmVentura | 22.x |
 | Sonoma 14.0–14.3 | AirportItlwmSonomaUpTo14dot3 | 23.0.0–23.3.99 |
 | Sonoma 14.4+ | AirportItlwmSonomaAbove14dot4 | 23.4.0–23.99.99 |
-| Sequoia (15.x) ～ Tahoe (26.x) | AirportItlwmAboveSequoia | 24.0.0+ |
+| Sequoia (15.x) | AirportItlwmSequoia（laobamac 构建） | 24.x |
+| Tahoe (26.x) | AirportItlwmTahoe（laobamac 构建） | 25.x+ |
 
-Sequoia+ 额外加载 `IOSkywalkFamily`、`IO80211FamilyLegacy`（传统 Wi-Fi 框架，均 MinKernel 24.0.0），并需配合 OCLP-MOD 补丁。
-
-> **关于 AirportItlwmAboveSequoia**：itlwm 官方 release（v2.3.0）的构建目前仅提供到 Sonoma——其中 Sonoma 14.0–14.3 与 14.4+ 为两个互不通用的构建，且没有 Sequoia+ 版本，因此 Sequoia+ 只能沿用 Ventura 构建。本 EFI 中的 `AirportItlwmAboveSequoia.kext` 即为作者将 Ventura 版构建重命名所得，二进制与 `AirportItlwmVentura.kext` 相同。
+> **Sequoia / Tahoe 构建来源**：itlwm 官方 release 仅提供到 Sonoma，Sequoia (15.x) 与 Tahoe (26.x) 使用 [laobamac/itlwm](https://github.com/laobamac/itlwm/releases) 的 2.4.0 构建，直接以原生 Wi-Fi 接口工作，无需替换 IOSkywalkFamily / IO80211FamilyLegacy 传统框架（原 OCLP 方案已随新构建移除）。更新跟随 laobamac 的 release。
 
 ## Tahoe 音频
 
-AppleALC 已集成，但 Tahoe 底层变更后需配合 OCLP-MOD 补丁，音频设备才能正常唤醒。
+Tahoe 移除了 AppleHDA.kext。本 EFI 集成 [laobamac/SimpleHDA](https://github.com/laobamac/SimpleHDA) 的 `SimpleHDA.kext`（Lilu 插件，MinKernel 25.0.0）恢复 AppleHDA，AppleALC 继续负责编解码（`alcid=101`）。

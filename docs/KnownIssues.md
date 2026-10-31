@@ -16,7 +16,7 @@ macOS 的 `bluetoothd` 在建立 A2DP 通道时会读取蓝牙硬件时钟（HCI
 
 ### 3. 引导加载偶发卡住（未根治）
 
-全版本通病：系统加载过程中偶尔卡住。可先按键盘任意键恢复引导，无效则强制重启。普遍怀疑与 AMD 双 XHCI 控制器的不稳定有关；本 EFI 已做 USB 定制并按版本区分控制器策略，发生率已降至最低。
+全版本通病：系统加载过程中偶尔卡住。可先按键盘任意键恢复引导，无效则强制重启。普遍怀疑与 AMD 双 XHCI 控制器的不稳定有关；本 EFI 已改用预生成 USB 映射（`USBMap.kext`），仅在 10.14–10.15 config 中保留禁用第二 XHCI 控制器的策略，发生率已降至最低。
 
 ### 4. Chromium / Electron 应用卡死（NootedRed 已知限制）
 
@@ -47,3 +47,9 @@ Tahoe 上 Finder、右键菜单、打开应用卡顿的常见主因是 Spotlight
 ### 6. macOS 26 动画掉帧
 
 可尝试 [CompositorPacer](https://github.com/githubzijian/CompositorPacer)：通过一个不可见的 Metal 节拍窗口保持 WindowServer 合成路径活跃，改善部分 macOS 26 环境下的动画掉帧感。
+
+### 7. Intel 蓝牙 HID 设备无法连接（已解决）
+
+蓝牙 HID 设备（鼠标、键盘等）配对后无法连接。随 Intel 蓝牙驱动整体换用 [emulatorchen/IntelBluetoothFirmware](https://github.com/emulatorchen/IntelBluetoothFirmware) 第三方 fork 的 2.5.2（`IntelBluetoothFirmware` / `IntelBTPatcher` / `IntelBluetoothInjector`）解决，配合修复版 BlueToolFixup 2.7.3 与 `-btlfxa2dpcheck`。
+>
+> ⚠️ 蓝牙三件套为**第三方 fork**，请勿替换为官方版本，详见 [Kexts.md](./Kexts.md#不能跟随官方更新的-kext)。
