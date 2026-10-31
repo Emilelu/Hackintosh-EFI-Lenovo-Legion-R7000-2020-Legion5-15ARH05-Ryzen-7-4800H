@@ -2,6 +2,8 @@
 
 > 返回 [主 README](../README.md)
 
+> Language: [English](./Compatibility.en.md) | 中文（本页）
+
 ## 各版本差异速查
 
 | macOS | USB 方案 | 蓝牙 | Wi-Fi | 其他 |

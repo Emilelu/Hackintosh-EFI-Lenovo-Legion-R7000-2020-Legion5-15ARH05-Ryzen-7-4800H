@@ -1,5 +1,7 @@
 # Hackintosh-EFI-Lenovo-Legion-R7000-2020-Ryzen-7-4800H
 
+> Language: [English](./README.en.md) | 中文（本页）
+
 Lenovo 拯救者 R7000 2020（AMD Ryzen 7 4800H）专用 OpenCore EFI（OpenCore 1.0.9 dev），基于 SimpleKaruzi 的 EFI 深度调校，力求开箱即用。
 
 - **支持范围**：实测 Catalina (10.15) ～ Tahoe (26)；Mojave (10.14) 为理论支持，未实测。
@@ -15,6 +17,8 @@ Lenovo 拯救者 R7000 2020（AMD Ryzen 7 4800H）专用 OpenCore EFI（OpenCore
 | [docs/Kexts.md](./docs/Kexts.md) | Kext 一览、维护须知（⚠️ 含不可更新清单）、NVMeFix 说明 |
 | [docs/Optional.md](./docs/Optional.md) | 可选优化（HiDPI、内建麦克风等） |
 | [docs/Links.md](./docs/Links.md) | 全部参考链接（修复出处、新方案出处、实验分支） |
+
+> 全部文档均有英文版：[README.en.md](./README.en.md) 与 `docs/*.en.md`，各页顶部可互切。
 
 ## 硬件配置
 

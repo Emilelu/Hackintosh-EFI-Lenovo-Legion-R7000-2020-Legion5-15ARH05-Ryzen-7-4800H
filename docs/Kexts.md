@@ -2,6 +2,8 @@
 
 > 返回 [主 README](../README.md)
 
+> Language: [English](./Kexts.en.md) | 中文（本页）
+
 ## 已集成 Kext
 
 | 类别 | Kext | 版本 | 用途 / 适用版本 |

@@ -2,10 +2,17 @@
 
 > 返回 [主 README](../README.md)
 
+> Language: [English](./Optional.en.md) | 中文（本页）
+
 ## HiDPI
 
 - `one-key-hidpi-mod`：仅兼容 Ventura 及以下。
 - `BetterDisplay`：适配 Sonoma 及以上（激活工具：<https://macked.app/tools/betterdisplay.php>），运行时可能轻微卡顿。
+- **区别于一键工具的手动开启显示器 HiDPI 教程**（远景帖）：<https://bbs.pcbeta.com/forum.php?mod=viewthread&tid=1950179>
+
+## 常用脚本
+
+- **黑果子必备常用脚本**（远景帖）：<https://bbs.pcbeta.com/viewthread-2076529-1-1.html>
 
 ## SwitchResX 注册信息
 

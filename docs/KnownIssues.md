@@ -2,6 +2,8 @@
 
 > 返回 [主 README](../README.md)
 
+> Language: [English](./KnownIssues.en.md) | 中文（本页）
+
 ### 1. macOS Tahoe 26.4+ 启动 Kernel Panic（已修复）
 
 正常关机或重启后首次引导大概率触发 Kernel Panic，需强制重启一次。根因：Darwin 25.4.0 中内核线程 TSC 检查指令的偏移量由 0x488 移至 0x490，旧版 AMD 内核补丁的匹配掩码无法命中，补丁未生效。更新 AMD 内核补丁后彻底解决。
