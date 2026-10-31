@@ -18,7 +18,7 @@
 				<key>Comment</key>
 				<string>SSDT-Disable_GPU_GPP0.aml</string>
 				<key>Enabled</key>
-				<true/>
+				<false/>
 				<key>Path</key>
 				<string>SSDT-Disable_GPU_GPP0.aml</string>
 			</dict>
@@ -633,20 +633,7 @@
 				AQ==
 				</data>
 			</dict>
-			<key>PciRoot(0x0)/Pci(0x8,0x1)/Pci(0x0,0x0)</key>
-			<dict>
-				<key>AAPL00,override-no-connect</key>
-				<data>
-				AP///////wBNEHQVAAAAAAogAQSlIhN4Aw+VrlJDsCYP
-				UFQAAAABAQEBAQEBAQEBAQEBAQEBY2MAoKCgd1AwIDUA
-				WMIQAAAYAAAA/QwwpQMDRgEKICAgICAgAAAAEAAAAAAA
-				AAAAAAAAAAAAAAAA/ABMUTE1NlQxSlcwNQogAfhwIHkC
-				ACIAKCmtCoT/CZ8ALwAfAJ8FdgACAAQA3OEDBP8JnwAv
-				AB8AnwV2AAIABAArAAwnADykAAAnADA7AAAAAAAAAAAA
-				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+ZA=
-				</data>
-			</dict>
+			
 			<key>PciRoot(0x0)/Pci(0x8,0x1)/Pci(0x0,0x6)</key>
 			<dict>
 				<key>layout-id</key>
@@ -920,7 +907,7 @@
 				<key>Comment</key>
 				<string>V0.9.0 |  | SimpleKaruzi</string>
 				<key>Enabled</key>
-				<true/>
+				<false/>
 				<key>ExecutablePath</key>
 				<string>Contents/MacOS/NootedRed</string>
 				<key>MaxKernel</key>
@@ -1525,7 +1512,23 @@
 				<key>Strategy</key>
 				<string>Exclude</string>
 			</dict>
-		</array>
+					<dict>
+				<key>Arch</key>
+				<string>x86_64</string>
+				<key>Comment</key>
+				<string></string>
+				<key>Enabled</key>
+				<true/>
+				<key>Identifier</key>
+				<string>com.apple.iokit.IONDRVSupport</string>
+				<key>MaxKernel</key>
+				<string></string>
+				<key>MinKernel</key>
+				<string>24.0.0</string>
+				<key>Strategy</key>
+				<string>Exclude</string>
+			</dict>
+</array>
 		<key>Emulate</key>
 		<dict>
 			<key>Cpuid1Data</key>
@@ -2775,10 +2778,10 @@
 				AAAAAAAAAAAAAAAAAAA=
 				</data>
 				<key>boot-args</key>
-				<string>-v debug=0x100 keepsyms=1 ipc_control_port_options=0 -lilubetaall -amfipassbeta -vi2c-force-polling alcid=101 -btlfxa2dpcheck itlwm_he=1</string>
+				<string>-v debug=0x100 keepsyms=1 -lilubetaall -amfipassbeta -vi2c-force-polling alcid=101 -btlfxa2dpcheck itlwm_he=1 nvrmsettle=10000 nvfb=1 nvaccel=1 nvfbheads=2 -nvkmsnosmooth ipc_control_port_options=0</string>
 				<key>csr-active-config</key>
 				<data>
-				AwgAAA==
+				QwoAAA==
 				</data>
 				<key>prev-lang:kbd</key>
 				<data>
