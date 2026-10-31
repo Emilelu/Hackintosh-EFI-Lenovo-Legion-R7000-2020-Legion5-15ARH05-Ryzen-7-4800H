@@ -30,3 +30,20 @@
 ## macOS 26 动画掉帧
 
 可尝试 [CompositorPacer](https://github.com/githubzijian/CompositorPacer)：通过一个不可见的 Metal 节拍窗口保持 WindowServer 合成路径活跃，改善部分 macOS 26 环境下的动画掉帧感。
+
+## 虚拟机与 Docker（AMD-V）
+
+[RyzenHV](https://github.com/OverlordDev/ryzen-hypervisor.framework) 用 kext 在 AMD-V（SVM）之上实现 `Hypervisor.framework` 接口。AMD 平台 `kern.hv_support` 恒为 0，Docker Desktop、Parallels、VirtualBox、`qemu -accel hvf` 因此都起不来；装上它，这些程序无需改动即可运行。**属实验性项目**，本 EFI 不内置，自行取用前注意：
+
+- 需在 BIOS 中**开启 SVM**（本 EFI 的 BIOS 设置里 SVM 可关，装了 RyzenHV 这条即不再成立）；
+- 先在**备用 EFI** 上试：kext 由 `./rhv kext --native` 写入 EFI，出问题改从不含该 kext 的 EFI 启动，或临时加 boot-arg `-rhv_off`；
+- 作者仅在 Ryzen 7 5800H + Sequoia 15.8.1 上验证，本机 4800H 与 macOS 26 均未验证（macOS 26 下 Docker 可能还需放宽 AMFI）；
+- 各虚拟机程序的可用程度差别很大，以项目 README 的支持矩阵为准（0.7.7：Docker Desktop 4.97.0 可用；Parallels 仅 26.5.0 build 57613；VirtualBox 7.x 实验性；VMware Fusion 尚不可用）。
+
+## arm64 应用（Maclator）
+
+[Maclator](https://github.com/linuxkid473/maclator) 是"反向 Rosetta"：把真正的 arm64 用户态（dyld 与 arm64e dyld 共享缓存，由你自行从 Apple 服务器下载）与 arm64 Mach-O 一起加载，用解释器 + x86-64 JIT 执行，系统调用交给 x86-64 宿主内核，Metal 调用可桥接到宿主 GPU。用途是让只发 arm64 的新应用在 x86-64 上还有一试的余地。属实验性研究项目，注意：
+
+- 作者按 **Intel Mac** 设计，并在 Intel Core i5-4440 + macOS 26.7 上验证；本机是 AMD 平台，未验证（JIT 与 Metal 桥在本机能否工作需自测）；
+- 需 macOS 26 宿主、Xcode 命令行工具与 Rust 工具链，约 10 GB 空闲磁盘，首次还要下载约 5.5 GB 的 arm64e dyld 共享缓存；
+- 已跑通 arm64 命令行工具、小型 AppKit 应用、VS Code 与 Chromium（含 GPU 加速）；音频、多数 IOKit 硬件、沙盒应用与 `CAMetalLayer` 类应用尚不支持。

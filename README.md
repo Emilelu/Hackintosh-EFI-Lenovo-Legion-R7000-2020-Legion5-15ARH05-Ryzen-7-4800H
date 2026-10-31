@@ -14,7 +14,7 @@ Lenovo 拯救者 R7000 2020（海外版：Legion 5 15ARH05，AMD Ryzen 7 4800H�
 | [docs/Compatibility.md](./docs/Compatibility.md) | 各 macOS 版本差异速查、Wi-Fi 驱动矩阵、Tahoe 音频 |
 | [docs/KnownIssues.md](./docs/KnownIssues.md) | 已知问题与修复（Kernel Panic、蓝牙、卡顿等） |
 | [docs/Kexts.md](./docs/Kexts.md) | Kext 一览、维护须知（⚠️ 含不可更新清单）、NVMeFix 说明 |
-| [docs/Optional.md](./docs/Optional.md) | 可选优化（HiDPI、内建麦克风、常用脚本等） |
+| [docs/Optional.md](./docs/Optional.md) | 可选优化与增强（HiDPI、内建麦克风、常用脚本等） |
 
 > 全部文档均有英文版：[README.en.md](./README.en.md) 与 `docs/*.en.md`，各页顶部可互切。各问题修复与工具的链接内联在对应文档条目中。
 
