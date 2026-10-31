@@ -46,11 +46,7 @@ On Tahoe, Finder, right-click menus and app launches stuttering is often caused 
 - Cost: you lose system-wide search; third-party tools like Raycast can fill in.
 > Details: [pcbeta thread](https://bbs.pcbeta.com/viewthread-2073020-1-1.html)
 
-### 6. macOS 26 animation frame drops
-
-Try [CompositorPacer](https://github.com/githubzijian/CompositorPacer): an invisible Metal "metronome" window keeps the WindowServer composition path busy, improving the animation frame-drop feel on some macOS 26 setups.
-
-### 7. Intel Bluetooth HID devices fail to connect (solved)
+### 6. Intel Bluetooth HID devices fail to connect (solved)
 
 Bluetooth HID devices (mice, keyboards, etc.) pair but never connect. Solved by moving the Intel Bluetooth drivers to the [emulatorchen/IntelBluetoothFirmware](https://github.com/emulatorchen/IntelBluetoothFirmware) third-party fork at 2.5.2 (`IntelBluetoothFirmware` / `IntelBTPatcher` / `IntelBluetoothInjector`), together with the fixed BlueToolFixup 2.7.3 and `-btlfxa2dpcheck`.
 >

@@ -46,11 +46,7 @@ Tahoe 上 Finder、右键菜单、打开应用卡顿的常见主因是 Spotlight
 - 代价：失去系统级搜索，可改用 Raycast 等第三方工具。
 > 详情：[远景论坛帖子](https://bbs.pcbeta.com/viewthread-2073020-1-1.html)
 
-### 6. macOS 26 动画掉帧
-
-可尝试 [CompositorPacer](https://github.com/githubzijian/CompositorPacer)：通过一个不可见的 Metal 节拍窗口保持 WindowServer 合成路径活跃，改善部分 macOS 26 环境下的动画掉帧感。
-
-### 7. Intel 蓝牙 HID 设备无法连接（已解决）
+### 6. Intel 蓝牙 HID 设备无法连接（已解决）
 
 蓝牙 HID 设备（鼠标、键盘等）配对后无法连接。随 Intel 蓝牙驱动整体换用 [emulatorchen/IntelBluetoothFirmware](https://github.com/emulatorchen/IntelBluetoothFirmware) 第三方 fork 的 2.5.2（`IntelBluetoothFirmware` / `IntelBTPatcher` / `IntelBluetoothInjector`）解决，配合修复版 BlueToolFixup 2.7.3 与 `-btlfxa2dpcheck`。
 >

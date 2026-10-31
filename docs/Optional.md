@@ -26,3 +26,7 @@
 - 必须安装到 `/Library/Extensions`，不支持经 OpenCore 注入（因此本 EFI 不内置）；
 - 需允许加载不受信任的 kext（`csr-active-config=01000000`，降低系统安全性）；
 - 已在 Ryzen 5 5500U + macOS 26.5.1 验证；本机麦克风是否走 ACP/PDM 通道需自行确认。
+
+## macOS 26 动画掉帧
+
+可尝试 [CompositorPacer](https://github.com/githubzijian/CompositorPacer)：通过一个不可见的 Metal 节拍窗口保持 WindowServer 合成路径活跃，改善部分 macOS 26 环境下的动画掉帧感。
