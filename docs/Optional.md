@@ -14,6 +14,14 @@
 
 - **黑果子必备常用脚本**（远景帖）：<https://bbs.pcbeta.com/viewthread-2076529-1-1.html>
 
+## 启动菜单与默认系统
+
+OpenCore **没有**「记住上次启动」的开关，能做的只有「设定默认项 + 超时自动进入」：
+
+- 默认项：在选择器里高亮目标盘后按 `Ctrl+Enter`（`Misc → Security → AllowSetDefault` 已开启），或进 macOS 后在「系统设置 → 启动磁盘」里切换；
+- 超时：`Misc → Boot → Timeout = 8`（8 秒无操作自动进默认项）；想恢复无限等待改回 `0`；
+- 扫描范围：`Misc → Security → ScanPolicy = 33494787`，放行 APFS / HFS / ESP / EXT 与全部设备类型，**不含 NTFS**，因此 Windows 不进入菜单；若要让 Windows 重新出现，把 NTFS 位 `0x800` 加回去；若插 U 盘看不到引导项，检查 ESP 位 `0x400` 是否被去掉。
+
 ## SwitchResX 注册信息
 
 - Name：`Peter Gunn`

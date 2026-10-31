@@ -14,6 +14,14 @@
 
 - **Must-have scripts for Hackintosh** — pcbeta thread: <https://bbs.pcbeta.com/viewthread-2076529-1-1.html>
 
+## Boot menu and default entry
+
+OpenCore has **no** "remember the last boot" switch; what you can do is set a default entry and let the timeout boot it:
+
+- Default entry: highlight the volume in the picker and press `Ctrl+Enter` (`Misc → Security → AllowSetDefault` is enabled), or switch it later in System Settings → Startup Disk;
+- Timeout: `Misc → Boot → Timeout = 8` (boots the default entry after 8 idle seconds); set it back to `0` for an unlimited wait;
+- Scan range: `Misc → Security → ScanPolicy = 33494787` allows APFS / HFS / ESP / EXT and every device type, **not NTFS**, so Windows stays out of the menu; add the NTFS bit `0x800` back to show it again; if a USB stick does not appear, check whether the ESP bit `0x400` is missing.
+
 ## SwitchResX registration
 
 - Name: `Peter Gunn`
