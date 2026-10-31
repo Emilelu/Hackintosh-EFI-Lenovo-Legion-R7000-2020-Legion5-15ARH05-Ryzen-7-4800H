@@ -1,0 +1,6 @@
+# Disable all line-ending conversion by default: never rewrite files on
+# checkout/stash/diff regardless of the local core.autocrlf setting.
+* -text
+# Property lists are text: normalize to LF both in the repository and in the
+# working tree (OpenCore config files and kext Info.plists).
+*.plist text eol=lf

@@ -1,0 +1,6 @@
+#!/bin/sh
+# Pre-commit: auto-scrub SMBIOS identity from staged EFI plists and block the
+# burned (publicly leaked) identity. Enabled repo-locally via:
+#   git config core.hooksPath .githooks
+# Bypass with `git commit --no-verify` only if you know exactly why.
+exec python "$(git rev-parse --show-toplevel)/tools/scrub-smbios.py"

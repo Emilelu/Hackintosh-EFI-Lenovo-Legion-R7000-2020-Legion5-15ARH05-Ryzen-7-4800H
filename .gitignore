@@ -1,4 +1,5 @@
 **/.contentFlavour
 **/.contentVisibility
 
-**/oldConfig.plist
+**/oldConfig.plist__pycache__/
+*.pyc
