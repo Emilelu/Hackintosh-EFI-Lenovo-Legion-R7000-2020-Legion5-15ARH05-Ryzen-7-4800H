@@ -35,7 +35,22 @@ The repository ships only two configs (Big Sur has been folded into the default 
 
 It must stay enabled in daily use — the iGPU driver depends on it.
 
-### boot-args
+## BIOS setup
+
+- **Enable** Switchable Graphics (dual-GPU switching)
+- UMA Frame Buffer Size ≥ **1G**
+- **Disable** Secure Boot; AMD SVM and TPM may be turned off as well (no impact either way)
+
+## NVMe compatibility
+
+The factory SK hynix PC611 is not in macOS's native support list (macOS 11–15 hits an Identify-timeout panic). The default config ships with `PC711ProbeForce.kext` enabled: it **forces NVMe drives that macOS does not natively support to work**, replacing the old "block the factory drive slot" approach.
+
+- The factory PC611 is force-driven by PC711ProbeForce on macOS 11–15 no matter which slot it sits in; macOS 26 supports PC711 natively and needs no kext.
+- 10.14–10.15 fall below PC711Probe's minimum kernel (it does not load): the factory drive is unusable there, but does not panic.
+- `SSDT-Disable_NVMe_GPP1.aml` (blocks the GPP1 slot) is disabled by default in both configs — enable it manually only if Force does not suit your drive.
+- Swapping in WD, Samsung or other compatible drives requires no action either.
+
+## boot-args
 
 ```
 -v debug=0x100 keepsyms=1 ipc_control_port_options=0 -lilubetaall -amfipassbeta -vi2c-force-polling alcid=101 -btlfxa2dpcheck itlwm_he=1
@@ -53,21 +68,6 @@ It must stay enabled in daily use — the iGPU driver depends on it.
 | `itlwm_he=1` | Enables Wi-Fi 6 (HE) mode for the Intel AX200 |
 
 The two configs' boot-args differ only by `itlwm_he=1` and `ipc_control_port_options=0` (useless on older versions, hence omitted); everything else is identical.
-
-## BIOS setup
-
-- **Enable** Switchable Graphics (dual-GPU switching)
-- UMA Frame Buffer Size ≥ **1G**
-- **Disable** Secure Boot; AMD SVM and TPM may be turned off as well (no impact either way)
-
-## NVMe compatibility
-
-The factory SK hynix PC611 is not in macOS's native support list (macOS 11–15 hits an Identify-timeout panic). The default config ships with `PC711ProbeForce.kext` enabled: it **forces NVMe drives that macOS does not natively support to work**, replacing the old "block the factory drive slot" approach.
-
-- The factory PC611 is force-driven by PC711ProbeForce on macOS 11–15 no matter which slot it sits in; macOS 26 supports PC711 natively and needs no kext.
-- 10.14–10.15 fall below PC711Probe's minimum kernel (it does not load): the factory drive is unusable there, but does not panic.
-- `SSDT-Disable_NVMe_GPP1.aml` (blocks the GPP1 slot) is disabled by default in both configs — enable it manually only if Force does not suit your drive.
-- Swapping in WD, Samsung or other compatible drives requires no action either.
 
 ## Hardware
 
@@ -96,8 +96,8 @@ The factory SK hynix PC611 is not in macOS's native support list (macOS 11–15 
 | SimpleHDA: restores AppleHDA removed in Tahoe (laobamac) | <https://github.com/laobamac/SimpleHDA> |
 | New pre-generated USB mapping idea (win10Q, Bilibili video) | <https://www.bilibili.com/video/BV1YK9XBqEbK/> |
 | IntelBluetoothFirmware third-party fork (fixes HID connections; do not use the official build) | <https://github.com/emulatorchen/IntelBluetoothFirmware> |
-| NVIDIA community-driver experiment (Turing and newer; the main branch keeps the iGPU setup) | <https://github.com/nullmoth/nvidia-macos-driver> |
-| ↳ upstream issue #220 matching this machine's boot hang | <https://github.com/nullmoth/nvidia-macos-driver/issues/220> |
+| nullmoth/nvidia-macos-driver: NVIDIA community-driver experiment (Turing and newer; the main branch keeps the iGPU setup) | <https://github.com/nullmoth/nvidia-macos-driver> |
+| ↳ nullmoth/nvidia-macos-driver#220: upstream issue #220 matching this machine's boot hang | <https://github.com/nullmoth/nvidia-macos-driver/issues/220> |
 | ↳ experimental branch experimental-nvidia-gtx1650 (NVIDIA experiment config) | <https://github.com/Emilelu/Hackintosh-EFI-Lenovo-Legion-R7000-2020-Legion5-15ARH05-Ryzen-7-4800H/tree/experimental-nvidia-gtx1650> |
 
 ## Afterword

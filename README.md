@@ -35,7 +35,22 @@ Lenovo 拯救者 R7000 2020（海外版：Legion 5 15ARH05，AMD Ryzen 7 4800H�
 
 日常使用必须保持启用——核显驱动依赖它。
 
-### boot-args
+## BIOS 设置
+
+- **启用** Switchable Graphics（双显卡切换）
+- UMA Frame Buffer Size ≥ **1G**
+- **关闭** Secure Boot；AMD SVM 与 TPM 可选关闭（不影响使用）
+
+## NVMe 兼容说明
+
+出厂海力士 PC611 不在 macOS 原生支持列表内（macOS 11–15 触发 Identify 超时 panic）。默认 config 已启用 `PC711ProbeForce.kext`：**强制让 macOS 原生不支持的 NVMe 也能运行**，取代旧的"屏蔽出厂盘位"方案。
+
+- 出厂 PC611 无论在哪个硬盘位，macOS 11–15 都由 PC711ProbeForce 强制驱动；macOS 26 原生支持 PC711，无需加载。
+- 10.14–10.15 低于 PC711Probe 的最低内核要求（不加载）：该版本下出厂盘不可用，但不会触发 panic。
+- `SSDT-Disable_NVMe_GPP1.aml`（屏蔽 GPP1 盘位）在两份 config 中均已默认关闭，仅当 Force 不适用于你的型号时再手动开启。
+- 更换为 WD、Samsung 等兼容硬盘时无需任何处理。
+
+## boot-args
 
 ```
 -v debug=0x100 keepsyms=1 ipc_control_port_options=0 -lilubetaall -amfipassbeta -vi2c-force-polling alcid=101 -btlfxa2dpcheck itlwm_he=1
@@ -53,21 +68,6 @@ Lenovo 拯救者 R7000 2020（海外版：Legion 5 15ARH05，AMD Ryzen 7 4800H�
 | `itlwm_he=1` | Intel AX200 启用 Wi-Fi 6（HE）模式 |
 
 两份 config 的 boot-args 仅差 `itlwm_he=1` 与 `ipc_control_port_options=0`（低版本用不到，已省略），其余完全相同。
-
-## BIOS 设置
-
-- **启用** Switchable Graphics（双显卡切换）
-- UMA Frame Buffer Size ≥ **1G**
-- **关闭** Secure Boot；AMD SVM 与 TPM 可选关闭（不影响使用）
-
-## NVMe 兼容说明
-
-出厂海力士 PC611 不在 macOS 原生支持列表内（macOS 11–15 触发 Identify 超时 panic）。默认 config 已启用 `PC711ProbeForce.kext`：**强制让 macOS 原生不支持的 NVMe 也能运行**，取代旧的"屏蔽出厂盘位"方案。
-
-- 出厂 PC611 无论在哪个硬盘位，macOS 11–15 都由 PC711ProbeForce 强制驱动；macOS 26 原生支持 PC711，无需加载。
-- 10.14–10.15 低于 PC711Probe 的最低内核要求（不加载）：该版本下出厂盘不可用，但不会触发 panic。
-- `SSDT-Disable_NVMe_GPP1.aml`（屏蔽 GPP1 盘位）在两份 config 中均已默认关闭，仅当 Force 不适用于你的型号时再手动开启。
-- 更换为 WD、Samsung 等兼容硬盘时无需任何处理。
 
 ## 硬件配置
 
@@ -96,8 +96,8 @@ Lenovo 拯救者 R7000 2020（海外版：Legion 5 15ARH05，AMD Ryzen 7 4800H�
 | SimpleHDA：恢复 Tahoe 移除的 AppleHDA（laobamac） | <https://github.com/laobamac/SimpleHDA> |
 | USB 预生成映射新思路（win10Q，B 站视频） | <https://www.bilibili.com/video/BV1YK9XBqEbK/> |
 | IntelBluetoothFirmware 第三方 fork（修复 HID 连接，勿用官方版） | <https://github.com/emulatorchen/IntelBluetoothFirmware> |
-| NVIDIA 社区驱动实验（Turing 及更新；主分支保持核显方案） | <https://github.com/nullmoth/nvidia-macos-driver> |
-| ↳ 本机卡住对应的上游 issue #220 | <https://github.com/nullmoth/nvidia-macos-driver/issues/220> |
+| nullmoth/nvidia-macos-driver：NVIDIA 社区驱动实验（Turing 及更新；主分支保持核显方案） | <https://github.com/nullmoth/nvidia-macos-driver> |
+| ↳ nullmoth/nvidia-macos-driver#220：本机卡住对应的上游 issue #220 | <https://github.com/nullmoth/nvidia-macos-driver/issues/220> |
 | ↳ 实验分支 experimental-nvidia-gtx1650（N 卡实验 config） | <https://github.com/Emilelu/Hackintosh-EFI-Lenovo-Legion-R7000-2020-Legion5-15ARH05-Ryzen-7-4800H/tree/experimental-nvidia-gtx1650> |
 
 ## 后记
