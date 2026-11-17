@@ -344,9 +344,9 @@
 				<key>Arch</key>
 				<string>Any</string>
 				<key>BundlePath</key>
-				<string>AirportItlwm.kext</string>
+				<string>AirportItlwmTahoe.kext</string>
 				<key>Comment</key>
-				<string>V2.4.0</string>
+				<string>V2.4.0 | laobamac | Tahoe 26</string>
 				<key>Enabled</key>
 				<true/>
 				<key>ExecutablePath</key>
