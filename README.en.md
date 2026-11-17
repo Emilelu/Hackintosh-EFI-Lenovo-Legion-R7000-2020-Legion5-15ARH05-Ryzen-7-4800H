@@ -51,6 +51,7 @@ This branch tests [nullmoth/nvidia-macos-driver](https://github.com/nullmoth/nvi
 | iGPU driver | NootedRed enabled | Not loaded |
 | dGPU | Blocked by `SSDT-Disable_GPU_GPP0.aml` | Unblocked, driven by nullmoth's driver |
 | `Kernel → Block` | `AppleEthernetRL` only | adds `com.apple.iokit.IONDRVSupport` (keeps the firmware framebuffer off display index 0) |
+| `Booter → Quirks` | OpenCore defaults | `AllowRelocationBlock` / `FixupAppleEfiImages` / `DisableVariableWrite` on, `SetupVirtualMap` off — required to bring the NVIDIA driver up |
 | APFS | OpenCore `EnableJumpstart` | `EnableJumpstart=false` plus `apfs_aligned.efi` |
 | Audio | AppleALC + SimpleHDA | adds `NMHDA.kext` (HDMI audio) |
 | SIP | `0x803` | `0x430a0000` (driver requirement) |

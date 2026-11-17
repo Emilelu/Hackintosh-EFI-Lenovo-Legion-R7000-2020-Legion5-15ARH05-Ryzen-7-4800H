@@ -51,6 +51,7 @@ Lenovo 拯救者 R7000 2020（海外版：Legion 5 15ARH05，AMD Ryzen 7 4800H�
 | 核显驱动 | NootedRed 启用 | 不加载 |
 | 独显 | `SSDT-Disable_GPU_GPP0.aml` 屏蔽 | 不屏蔽，交给 nullmoth 驱动 |
 | `Kernel → Block` | 仅 `AppleEthernetRL` | 追加 `com.apple.iokit.IONDRVSupport`（避免固件帧缓冲占用 display index 0） |
+| `Booter → Quirks` | OpenCore 默认 | 开启 `AllowRelocationBlock` / `FixupAppleEfiImages` / `DisableVariableWrite`，关闭 `SetupVirtualMap`——驱动 N 卡所需 |
 | APFS | OpenCore 内置 `EnableJumpstart` | `EnableJumpstart=false`，改用 `apfs_aligned.efi` |
 | 音频 | AppleALC + SimpleHDA | 追加 `NMHDA.kext`（HDMI 音频） |
 | SIP | `0x803` | `0x430a0000`（驱动要求） |
