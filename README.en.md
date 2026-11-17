@@ -7,6 +7,8 @@ OpenCore EFI dedicated to the Lenovo Legion R7000 2020 (China model; sold intern
 - **Supported range**: tested Catalina (10.15) – Tahoe (26); Mojave (10.14) is theoretically supported, untested.
 - Installation screenshots per macOS version: [Screenshots](./Screenshots).
 
+> ⚠️ **Generate your own SMBIOS with OCAT before first use.** The shipped config has its identity blanked (`SystemSerialNumber` / `MLB` / `SystemUUID` empty, `ROM` zero-length). Booting it as-is makes Setup Assistant crash, then the machine powers off or reboots. Use [OCAT (OCAuxiliaryTools)](https://github.com/ic005k/OCAuxiliaryTools) to generate a fresh set for `MacBookPro16,2` into `PlatformInfo → Generic`, or fill in a valid serial plus a 6-byte ROM (the wired NIC MAC). Keep the identity local and never commit it back.
+
 ## Documentation
 
 | Doc | Content |
@@ -27,13 +29,48 @@ The repository ships only two configs (Big Sur has been folded into the default 
 | `config_Mojave2Catalina.plist` | Mojave (10.14) – Catalina (10.15) | Enables `SSDT-Disable_XHC0.aml` to disable the second XHCI controller; `XhciPortLimit` on, no USB injection kext; SecureBootModel = `Default`; boot-args omit `itlwm_he=1` and `ipc_control_port_options=0` |
 | `config.plist` (default) | Big Sur (11.x) – Tahoe (26.x) | Pre-generated `USBMap.kext` injection for all versions; `XhciPortLimit` on; SecureBootModel = `Disabled` |
 
+> This branch's `config.plist` is the discrete-only NVIDIA experiment and is not interchangeable with the main branch — see the next section.
+>
 > Factory drive slot (GPP1): on macOS 11–15 the slot is handled by the default-enabled `PC711ProbeForce.kext`; macOS 26 supports PC711 natively; on 10.14–10.15 the drive is unusable (but does not panic). `SSDT-Disable_NVMe_GPP1.aml` is disabled by default in both configs — enable it manually only if you truly need the slot blocked.
 
-### Installation: temporarily disable NootedRed
+### About NootedRed (main branch only)
 
-**For a fresh system install, disable `NootedRed.kext` first**: set its `Enabled` to `false` under config `Kernel → Add`, then flip it back to `true` and reboot once you reach the desktop.
+The main branch depends on `NootedRed.kext`: for a fresh install set its `Enabled` to `false` under `Kernel → Add`, then flip it back to `true` and reboot once the desktop comes up.
 
-It must stay enabled in daily use — the iGPU driver depends on it.
+**This experimental branch does not load NootedRed** — the internal panel is driven by the GTX 1650, so none of that applies.
+
+## Experimental branch: NVIDIA GTX 1650, discrete-only
+
+This branch tests [nullmoth/nvidia-macos-driver](https://github.com/nullmoth/nvidia-macos-driver). It is mutually exclusive with the main branch (iGPU + NootedRed), which remains the daily-driver setup.
+
+### Differences from the main branch
+
+| Item | Main branch | This branch |
+|:---|:---|:---|
+| BIOS | Hybrid (Switchable Graphics on) | **Discrete-only**, internal panel driven by the GTX 1650 |
+| iGPU driver | NootedRed enabled | Not loaded |
+| dGPU | Blocked by `SSDT-Disable_GPU_GPP0.aml` | Unblocked, driven by nullmoth's driver |
+| `Kernel → Block` | `AppleEthernetRL` only | adds `com.apple.iokit.IONDRVSupport` (keeps the firmware framebuffer off display index 0) |
+| APFS | OpenCore `EnableJumpstart` | `EnableJumpstart=false` plus `apfs_aligned.efi` |
+| Audio | AppleALC + SimpleHDA | adds `NMHDA.kext` (HDMI audio) |
+| SIP | `0x803` | `0x430a0000` (driver requirement) |
+| boot-args | see below | adds `nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth nvrmsettle=10000 nvfbhidpi=1 nvrmtgp=1 nvrmgps=1 nvrmnvpcf=1 nmhdavol=1 nvrmacpibl=1 nmhybrid=1` |
+| Tools | — | `NullMothSafe.efi`: remove the NVIDIA driver / boot once without it |
+
+### Test status (2026-11-17, macOS 26.7.3)
+
+| Scenario | Result |
+|:---|:---|
+| Internal panel only | **Displays normally, reaches the desktop** |
+| Internal + external monitor | Both panels show the mouse pointer only; WindowServer suspected not to start. HiDPI and Hybrid are untestable |
+| Internal brightness | **Not adjustable** |
+
+The bottleneck has moved from driver bring-up to WindowServer / multi-display initialisation; whether BAR1 is fully resolved is still unconfirmed. Upstream: <https://github.com/nullmoth/nvidia-macos-driver/issues/220>.
+
+### Caveats
+
+- The two configs are not interchangeable: dropping this branch's `config.plist` into the main branch (or the other way round) gives no display or no boot.
+- Switch BIOS back to Switchable Graphics before returning to the main branch.
 
 ## BIOS setup
 
@@ -76,9 +113,9 @@ The two configs' boot-args differ only by `itlwm_he=1` and `ipc_control_port_opt
 | Mainboard | LENOVO LNVNB161216 | AMD-platform laptop (international model: Lenovo Legion 5 15ARH05) |
 | BIOS | EUCN41WW (2023-09-20) | UEFI, Secure Boot disabled in BIOS setup |
 | CPU | AMD Ryzen 7 4800H (Renoir) | 8 cores / 16 threads |
-| Discrete GPU | NVIDIA GeForce GTX 1650 | No official macOS driver; daily use keeps it blocked via `SSDT-Disable_GPU_GPP0.aml`. A community-driver experiment ([nullmoth/nvidia-macos-driver](https://github.com/nullmoth/nvidia-macos-driver), in progress) lives on the [experimental branch](https://github.com/Emilelu/Hackintosh-EFI-Lenovo-Legion-R7000-2020-Legion5-15ARH05-Ryzen-7-4800H/tree/experimental-nvidia-gtx1650) |
+| Discrete GPU | NVIDIA GeForce GTX 1650 | On this branch it is driven by [nullmoth/nvidia-macos-driver](https://github.com/nullmoth/nvidia-macos-driver); the main branch blocks it with `SSDT-Disable_GPU_GPP0.aml` |
 | iGPU | AMD Radeon(TM) Graphics (Renoir) | Unlocked via UMAF with VRAM set to 4G (NootedRed needs at least 512M, ≥1G recommended) |
-| Internal display | LQ156T1JW05 | 2560x1440 @ 165Hz, wired to the iGPU (swapped by the author); EDID injected into the config |
+| Internal display | LQ156T1JW05 | 2560x1440 @ 165Hz (swapped by the author); the main branch wires it to the iGPU and injects EDID, **this branch is discrete-only and the panel belongs to the GTX 1650** |
 | Ethernet | Realtek RTL8168/8111 | Device ID `10EC-8168` |
 | Wi-Fi | Intel Wi-Fi 6 AX200 | Device ID `8086-2723` |
 | Bluetooth | Intel Wireless Bluetooth | Device ID `8087-0029`; both the AirPods no-sound and HID connection issues are fixed (see [KnownIssues.en.md](./docs/KnownIssues.en.md#2-intel-bluetooth-airpods-no-sound-fixed)) |

@@ -7,6 +7,8 @@ Lenovo 拯救者 R7000 2020（海外版：Legion 5 15ARH05，AMD Ryzen 7 4800H�
 - **支持范围**：实测 Catalina (10.15) ～ Tahoe (26)；Mojave (10.14) 为理论支持，未实测。
 - 各版本安装成果截图见 [Screenshots](./Screenshots)。
 
+> ⚠️ **首次使用必须用 OCAT 生成三码。** 仓库内的 config 已清空 SMBIOS 身份（`SystemSerialNumber` / `MLB` / `SystemUUID` 为空，`ROM` 为 0 字节）。直接这样启动，首次进入设置助理时会闪退，随后自动关机或重启。请用 [OCAT（OCAuxiliaryTools）](https://github.com/ic005k/OCAuxiliaryTools) 为 `MacBookPro16,2` 生成一套新三码写入 `PlatformInfo → Generic`，或自行填入合法序列号与 6 字节 ROM（通常取有线网卡 MAC）。三码只保留在本地，不要提交回仓库。
+
 ## 文档导航
 
 | 文档 | 内容 |
@@ -27,17 +29,52 @@ Lenovo 拯救者 R7000 2020（海外版：Legion 5 15ARH05，AMD Ryzen 7 4800H�
 | `config_Mojave2Catalina.plist` | Mojave (10.14) ～ Catalina (10.15) | 启用 `SSDT-Disable_XHC0.aml` 禁用第二 XHCI 控制器；开启 `XhciPortLimit`，无 USB 注入 kext；SecureBootModel = `Default`；boot-args 少 `itlwm_he=1` 与 `ipc_control_port_options=0` |
 | `config.plist`（默认） | Big Sur (11.x) ～ Tahoe (26.x) | 预生成 `USBMap.kext` 全版本注入；开启 `XhciPortLimit`；SecureBootModel = `Disabled` |
 
+> 本分支的 `config.plist` 是 N 卡直连实验配置，与主分支不通用，说明见下一节。
+>
 > 出厂盘位（GPP1）的处理：macOS 11–15 由默认启用的 `PC711ProbeForce.kext` 强制驱动，macOS 26 原生支持，10.14–10.15 该盘不可用（也不会触发 panic）；`SSDT-Disable_NVMe_GPP1.aml` 在两份 config 中均已默认关闭，仅当确需屏蔽盘位时手动开启。
 
-### 安装阶段：临时禁用 NootedRed
+### 关于 NootedRed（仅主分支）
 
-**全新安装系统时，需先将 `NootedRed.kext` 临时禁用**：在 config 的 `Kernel → Add` 中把 `NootedRed.kext` 的 `Enabled` 设为 `false`，完成安装、进入桌面后再改回 `true` 并重启。
+主分支的日常使用依赖 `NootedRed.kext`：全新安装系统时先把它在 `Kernel → Add` 里设为 `false`，进入桌面后再改回 `true` 并重启。
 
-日常使用必须保持启用——核显驱动依赖它。
+**本实验分支不加载 NootedRed**，内屏由 GTX 1650 驱动，无需上述操作。
+
+## 实验分支：NVIDIA GTX 1650 直连
+
+本分支用于测试 [nullmoth/nvidia-macos-driver](https://github.com/nullmoth/nvidia-macos-driver)，与主分支（核显 + NootedRed）是两套互斥配置。**日常使用仍以主分支为准。**
+
+### 与主分支的差异
+
+| 项 | 主分支 | 本分支 |
+|:---|:---|:---|
+| BIOS | 混合模式（Switchable Graphics 开启） | **独显直连**，内屏归 GTX 1650 |
+| 核显驱动 | NootedRed 启用 | 不加载 |
+| 独显 | `SSDT-Disable_GPU_GPP0.aml` 屏蔽 | 不屏蔽，交给 nullmoth 驱动 |
+| `Kernel → Block` | 仅 `AppleEthernetRL` | 追加 `com.apple.iokit.IONDRVSupport`（避免固件帧缓冲占用 display index 0） |
+| APFS | OpenCore 内置 `EnableJumpstart` | `EnableJumpstart=false`，改用 `apfs_aligned.efi` |
+| 音频 | AppleALC + SimpleHDA | 追加 `NMHDA.kext`（HDMI 音频） |
+| SIP | `0x803` | `0x430a0000`（驱动要求） |
+| boot-args | 见下文 | 追加 `nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth nvrmsettle=10000 nvfbhidpi=1 nvrmtgp=1 nvrmgps=1 nvrmnvpcf=1 nmhdavol=1 nvrmacpibl=1 nmhybrid=1` |
+| 工具 | — | `NullMothSafe.efi`：卸载 NVIDIA 驱动 / 临时不加载驱动启动一次 |
+
+### 实测状态（2026-11-17，macOS 26.7.3）
+
+| 场景 | 结果 |
+|:---|:---|
+| 仅内屏 | **可正常显示并进入桌面** |
+| 内屏 + 外接显示器 | 两块屏都只剩鼠标指针，疑似 WindowServer 未启动；HiDPI 与 Hybrid 均无法验证 |
+| 内屏亮度调节 | **无效** |
+
+当前瓶颈已从驱动加载转移到 WindowServer / 多显示初始化，BAR1 是否彻底解决仍待确认。上游跟踪：<https://github.com/nullmoth/nvidia-macos-driver/issues/220>。
+
+### 注意
+
+- 两份 config 不通用：把本分支的 `config.plist` 直接放到主分支（或反之）会无显示或无法引导。
+- 切回主分支前，先把 BIOS 改回 Switchable Graphics。
 
 ## BIOS 设置
 
-- **启用** Switchable Graphics（双显卡切换）
+- **启用** Switchable Graphics（双显卡切换）——**本分支例外**，需关闭并切独显直连，见上文
 - UMA Frame Buffer Size ≥ **1G**
 - **关闭** Secure Boot；AMD SVM 与 TPM 可选关闭（不影响使用）
 
@@ -76,9 +113,9 @@ Lenovo 拯救者 R7000 2020（海外版：Legion 5 15ARH05，AMD Ryzen 7 4800H�
 | 主板 | LENOVO LNVNB161216 | AMD 平台笔记本（海外对应机型：Lenovo Legion 5 15ARH05） |
 | BIOS | EUCN41WW (2023-09-20) | UEFI，Secure Boot 已在 BIOS 内禁用 |
 | CPU | AMD Ryzen 7 4800H (Renoir) | 8 核心 16 线程 |
-| 独立显卡 | NVIDIA GeForce GTX 1650 | macOS 无官方驱动，日常使用已通过 `SSDT-Disable_GPU_GPP0.aml` 屏蔽；社区驱动实验（[nullmoth/nvidia-macos-driver](https://github.com/nullmoth/nvidia-macos-driver)，进行中）见 [experimental 分支](https://github.com/Emilelu/Hackintosh-EFI-Lenovo-Legion-R7000-2020-Legion5-15ARH05-Ryzen-7-4800H/tree/experimental-nvidia-gtx1650) |
+| 独立显卡 | NVIDIA GeForce GTX 1650 | 本分支由社区驱动 [nullmoth/nvidia-macos-driver](https://github.com/nullmoth/nvidia-macos-driver) 接管；主分支用 `SSDT-Disable_GPU_GPP0.aml` 屏蔽 |
 | 核显 | AMD Radeon(TM) Graphics (Renoir) | 已通过 UMAF 解锁并将显存设为 4G（NootedRed 最低 512M，建议 ≥1G） |
-| 内建显示器 | LQ156T1JW05 | 2560x1440 @ 165Hz，连接核显（自行更换），EDID 已注入 config |
+| 内建显示器 | LQ156T1JW05 | 2560x1440 @ 165Hz（自行更换）；主分支连接核显并注入 EDID，**本分支为独显直连，内屏归 GTX 1650** |
 | 有线网卡 | Realtek RTL8168/8111 | 设备 ID `10EC-8168` |
 | 无线网卡 | Intel Wi-Fi 6 AX200 | 设备 ID `8086-2723` |
 | 蓝牙 | Intel Wireless Bluetooth | 设备 ID `8087-0029`；AirPods 无声与 HID 设备连接问题均已修复（见 [KnownIssues.md](./docs/KnownIssues.md#2-intel-蓝牙连接-airpods-无声已修复)） |
