@@ -16,8 +16,8 @@
 | | `RestrictEvents` | 1.1.7 | 修复 CPU 名称显示等 |
 | 核显 | `NootedRed` | 0.9.0 | Renoir 核显驱动（Mojave+） |
 | | `BrightnessKeys` | 1.0.4 | 亮度快捷键 |
-| 音频 | `AppleALC` | 1.9.8 | 声卡编解码（`alcid=101`） |
-| | `SimpleHDA` | 1.0.0 | laobamac 出品，恢复 Tahoe 移除的 AppleHDA（MinKernel 25.0.0） |
+| 音频 | `AppleALC` | 1.9.9 | 声卡编解码（`alcid=101`） |
+| | `SimpleHDA` | 1.0.1 | laobamac 出品，恢复 Tahoe 移除的 AppleHDA（MinKernel 25.0.0） |
 | 有线网 | `RealtekRTL8111` | 3.0.0 | Realtek 网卡驱动 |
 | 无线网 | `AirportItlwm`（9 个版本） | 2.3.0 / 2.4.0 | 按 macOS 版本自动匹配：≤ Sonoma 为官方 2.3.0，Sequoia/Tahoe 为 [laobamac](https://github.com/laobamac/itlwm/releases) 2.4.0，见 [Compatibility.md](./Compatibility.md#wi-fi-驱动矩阵) |
 | 蓝牙 | `IntelBluetoothFirmware` / `IntelBTPatcher` | 2.5.2 | Intel 蓝牙固件与补丁（**emulatorchen fork**，勿用官方版） |
@@ -35,7 +35,6 @@
 | | `Innie` | 1.3.1 | 将 PCIe 设备标记为内建 |
 | | `AMFIPass` | 1.4.1 | 允许 OCLP-MOD 打补丁（Sequoia+ 配合 `-amfipassbeta`） |
 | | `HoRNDIS` | 9.2 | Android USB 网络共享 |
-| | `CpuTscSync` | 1.1.2 | TSC 同步备用方案（默认禁用，保留备用） |
 
 ## 不能跟随官方更新的 Kext
 
@@ -49,13 +48,13 @@
 | `USBMap.kext` 1.1 | 由 USBToolBox 导出的**本机预生成映射**，不是上游发布物（思路来自 win10Q） |
 | `CtlnaAHCIPort` / `SATA-unsupported` / `AppleMCEReporterDisabler` | 无官方 release 渠道的社区维护版，维持现状 |
 
-## 可更新 Kext 的现状（2026-10 核对）
+## 可更新 Kext 的现状（2026-11 核对）
 
 其余 kext 均可跟随官方更新。核对结果：
 
-- **已是最新**：ForgedInvariant 1.5.0、YogaSMC 1.5.3、ECEnabler 1.0.6、Innie 1.3.1、SMCProcessorAMD 1.0.1、PC711ProbeForce 1.8.1、SimpleHDA 1.0.0、HoRNDIS 9.2（官方早已停更）、RealtekRTL8111 3.0.0、AirportItlwm ≤ Sonoma（= itlwm 官方 v2.3.0，最新 release）与 Sequoia/Tahoe（= laobamac 2.4.0）。
+- **已是最新**：ForgedInvariant 1.5.0、YogaSMC 1.5.3、ECEnabler 1.0.6、Innie 1.3.1、SMCProcessorAMD 1.0.1、PC711ProbeForce 1.8.1、SimpleHDA 1.0.1、HoRNDIS 9.2（官方早已停更）、RealtekRTL8111 3.0.4、AirportItlwm ≤ Sonoma（= itlwm 官方 v2.3.0，最新 release）与 Sequoia/Tahoe（= laobamac 2.4.0）。
 - **本地高于官方 release**（CI 构建版，无需降级）：Lilu 1.7.3（官方 1.7.2；dortania CI 同为 1.7.3）、NootedRed 0.9.0（官方 0.8.10）、RestrictEvents 1.1.7（官方 1.1.6）、BrightnessKeys 1.0.4（官方 1.0.3）、NVMeFix 1.1.4（官方 1.1.3）、VoodooPS2Controller 2.3.8。
-- **本次已更新**：VirtualSMC 家族 1.3.8 → **1.3.9**（dortania CI b5c62c2）。
+- **本次已更新**：VirtualSMC 家族 1.3.8 → **1.3.9**（dortania CI b5c62c2）；2026-11 更新 AppleALC 1.9.8 → **1.9.9**、SimpleHDA 1.0.0 → **1.0.1**，VoodooI2C（含 VoodooGPIO）/ VoodooI2CHID / ForgedInvariant / Lilu 换用实机验证过的构建（版本号未变）。
 - **OpenCore 本体**：已更新至 **1.0.9 dev**（dortania 78d5ff8，2026-10-23），替换了 `BOOTx64.efi`、`OpenCore.efi`、`OpenRuntime.efi`、`OpenCanopy.efi`、`ResetNvramEntry.efi`；`HfsPlus.efi` 保持 OcBinaryData 版。两份 config 均通过 ocvalidate (1.0.9) 校验（1.0.9 起每个 Drivers 条目必填 `HideVerbose`，已补齐）。
 
 更新方法：从各官方仓库 release 下载，整体替换 `EFI/OC/Kexts/<名称>.kext` 目录即可，config 无需改动（BundlePath 不变；若版本有变建议同步 Comment 版本戳）。特殊渠道：蓝牙跟 [emulatorchen fork](https://github.com/emulatorchen/IntelBluetoothFirmware)，Sequoia/Tahoe 网卡跟 [laobamac/itlwm](https://github.com/laobamac/itlwm/releases)，NootedRed 跟 ChefKiss CI。
