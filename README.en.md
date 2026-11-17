@@ -7,6 +7,8 @@ OpenCore EFI dedicated to the Lenovo Legion R7000 2020 (China model; sold intern
 - **Supported range**: tested Catalina (10.15) – Tahoe (26); Mojave (10.14) is theoretically supported, untested.
 - Installation screenshots per macOS version: [Screenshots](./Screenshots).
 
+> ⚠️ **Generate your own SMBIOS with OCAT before first use.** The shipped config has its identity blanked (`SystemSerialNumber` / `MLB` / `SystemUUID` empty, `ROM` zero-length). Booting it as-is makes Setup Assistant crash, then the machine powers off or reboots. Use [OCAT (OCAuxiliaryTools)](https://github.com/ic005k/OCAuxiliaryTools) to generate a fresh set for `MacBookPro16,2` into `PlatformInfo → Generic`, or fill in a valid serial plus a 6-byte ROM (the wired NIC MAC). Keep the identity local and never commit it back.
+
 ## Documentation
 
 | Doc | Content |

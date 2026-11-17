@@ -7,6 +7,8 @@ Lenovo 拯救者 R7000 2020（海外版：Legion 5 15ARH05，AMD Ryzen 7 4800H�
 - **支持范围**：实测 Catalina (10.15) ～ Tahoe (26)；Mojave (10.14) 为理论支持，未实测。
 - 各版本安装成果截图见 [Screenshots](./Screenshots)。
 
+> ⚠️ **首次使用必须用 OCAT 生成三码。** 仓库内的 config 已清空 SMBIOS 身份（`SystemSerialNumber` / `MLB` / `SystemUUID` 为空，`ROM` 为 0 字节）。直接这样启动，首次进入设置助理时会闪退，随后自动关机或重启。请用 [OCAT（OCAuxiliaryTools）](https://github.com/ic005k/OCAuxiliaryTools) 为 `MacBookPro16,2` 生成一套新三码写入 `PlatformInfo → Generic`，或自行填入合法序列号与 6 字节 ROM（通常取有线网卡 MAC）。三码只保留在本地，不要提交回仓库。
+
 ## 文档导航
 
 | 文档 | 内容 |
