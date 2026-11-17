@@ -16,8 +16,8 @@
 | | `RestrictEvents` | 1.1.7 | Fixes CPU name display, etc. |
 | iGPU | `NootedRed` | 0.9.0 | Renoir iGPU driver (Mojave+) |
 | | `BrightnessKeys` | 1.0.4 | Brightness hotkeys |
-| Audio | `AppleALC` | 1.9.8 | Codec driver (`alcid=101`) |
-| | `SimpleHDA` | 1.0.0 | by laobamac, restores AppleHDA removed in Tahoe (MinKernel 25.0.0) |
+| Audio | `AppleALC` | 1.9.9 | Codec driver (`alcid=101`) |
+| | `SimpleHDA` | 1.0.1 | by laobamac, restores AppleHDA removed in Tahoe (MinKernel 25.0.0) |
 | Ethernet | `RealtekRTL8111` | 3.0.0 | Realtek NIC driver |
 | Wi-Fi | `AirportItlwm` (9 builds) | 2.3.0 / 2.4.0 | Matched per macOS version: ≤ Sonoma is official 2.3.0, Sequoia/Tahoe are [laobamac](https://github.com/laobamac/itlwm/releases) 2.4.0 — see [Compatibility.en.md](./Compatibility.en.md#wi-fi-driver-matrix) |
 | Bluetooth | `IntelBluetoothFirmware` / `IntelBTPatcher` | 2.5.2 | Intel Bluetooth firmware & patcher (**emulatorchen fork**, do not use the official build) |
@@ -35,7 +35,6 @@
 | | `Innie` | 1.3.1 | Marks PCIe devices as internal |
 | | `AMFIPass` | 1.4.1 | Allows OCLP-MOD patching (Sequoia+ with `-amfipassbeta`) |
 | | `HoRNDIS` | 9.2 | Android USB tethering |
-| | `CpuTscSync` | 1.1.2 | TSC sync fallback (disabled by default, kept for backup) |
 
 ## Kexts that must NOT follow official updates
 
@@ -49,13 +48,13 @@ These kexts are modified builds, third-party forks or local custom products. **U
 | `USBMap.kext` 1.1 | A **locally pre-generated USB map** exported by USBToolBox, not an upstream release (idea from win10Q) |
 | `CtlnaAHCIPort` / `SATA-unsupported` / `AppleMCEReporterDisabler` | Community-maintained builds with no official release channel; keep as-is |
 
-## Updatable kext status (checked 2026-10)
+## Updatable kext status (checked 2026-11)
 
 All other kexts can follow official updates. Findings:
 
-- **Already latest**: ForgedInvariant 1.5.0, YogaSMC 1.5.3, ECEnabler 1.0.6, Innie 1.3.1, SMCProcessorAMD 1.0.1, PC711ProbeForce 1.8.1, SimpleHDA 1.0.0, HoRNDIS 9.2 (upstream dead long ago), RealtekRTL8111 3.0.0, AirportItlwm ≤ Sonoma (= itlwm official v2.3.0, the latest release) and Sequoia/Tahoe (= laobamac 2.4.0).
+- **Already latest**: ForgedInvariant 1.5.0, YogaSMC 1.5.3, ECEnabler 1.0.6, Innie 1.3.1, SMCProcessorAMD 1.0.1, PC711ProbeForce 1.8.1, SimpleHDA 1.0.1, HoRNDIS 9.2 (upstream dead long ago), RealtekRTL8111 3.0.4, AirportItlwm ≤ Sonoma (= itlwm official v2.3.0, the latest release) and Sequoia/Tahoe (= laobamac 2.4.0).
 - **Local is ahead of the official release** (CI builds, no downgrade needed): Lilu 1.7.3 (official 1.7.2; dortania CI is also 1.7.3), NootedRed 0.9.0 (official 0.8.10), RestrictEvents 1.1.7 (official 1.1.6), BrightnessKeys 1.0.4 (official 1.0.3), NVMeFix 1.1.4 (official 1.1.3), VoodooPS2Controller 2.3.8.
-- **Updated this round**: VirtualSMC family 1.3.8 → **1.3.9** (dortania CI b5c62c2).
+- **Updated this round**: VirtualSMC family 1.3.8 → **1.3.9** (dortania CI b5c62c2); in 2026-11 AppleALC 1.9.8 → **1.9.9** and SimpleHDA 1.0.0 → **1.0.1**, and VoodooI2C (incl. VoodooGPIO) / VoodooI2CHID / ForgedInvariant / Lilu were switched to the builds verified on the machine (version numbers unchanged).
 - **OpenCore itself**: updated to **1.0.9 dev** (dortania 78d5ff8, 2026-10-23), replacing `BOOTx64.efi`, `OpenCore.efi`, `OpenRuntime.efi`, `OpenCanopy.efi`, `ResetNvramEntry.efi`; `HfsPlus.efi` stays at the OcBinaryData version. Both configs pass ocvalidate (1.0.9) — since 1.0.9 every Drivers entry requires the `HideVerbose` key, which has been added.
 
 Update method: download from each official repository release and replace the whole `EFI/OC/Kexts/<name>.kext` directory; the config needs no change (BundlePath unchanged; if the version changes, update the Comment version stamp too). Special channels: Bluetooth follows the [emulatorchen fork](https://github.com/emulatorchen/IntelBluetoothFirmware), Sequoia/Tahoe Wi-Fi follows [laobamac/itlwm](https://github.com/laobamac/itlwm/releases), NootedRed follows ChefKiss CI.
